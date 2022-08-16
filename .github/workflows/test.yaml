@@ -1,10 +1,10 @@
-name: Linting
+name: Tests
 
 on:
   push:
 
 jobs:
-  lint:
+  tests:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -15,5 +15,5 @@ jobs:
     - name: Install Dependencies
       run: make install
 
-    - name: Test Formatting
-      run: make lint
+    - name: Run tests
+      run: make test
