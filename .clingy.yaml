@@ -1,0 +1,10 @@
+label: clingy flow
+description: sample description
+steps:
+- label: start
+  description: starting clingy flow
+  command: echo 
+  args:
+    - "Starting"
+- label: run the command
+  command: ./nn.pex

@@ -1,0 +1,3 @@
+.venv
+*.egg-info
+docker-lib.sh
