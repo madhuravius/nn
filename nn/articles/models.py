@@ -13,6 +13,19 @@ class ArticleDataSource(DataClassJsonMixin):
     hn_id: Optional[int] = None
     hn_score: Optional[int] = None
 
+    lobsters_author: Optional[str] = None
+    lobsters_comment_count: Optional[int] = None
+    lobsters_score: Optional[int] = None
+    lobsters_short_id: Optional[str] = None
+
+
+@dataclass_json
+@dataclass
+class ArticleSource(DataClassJsonMixin):
+    id: uuid.UUID
+    name: str
+    link: str
+
 
 @dataclass_json
 @dataclass
@@ -24,4 +37,5 @@ class Article(DataClassJsonMixin):
     score: float
     created_date: str
     modified_date: str
+    article_source: ArticleSource
     article_data_sources: List[ArticleDataSource]

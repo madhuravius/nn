@@ -1,3 +1,6 @@
+[tool.isort]
+profile = "black"
+
 [tool.mypy]
 exclude = "build|tests"
 show_error_codes = true

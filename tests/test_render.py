@@ -5,7 +5,7 @@ from faker import Faker
 from pytest_httpx import HTTPXMock
 from rich.console import Console
 
-from nn.articles.models import Article
+from nn.articles.models import Article, ArticleSource
 from nn.articles.service import get_and_show_articles
 from nn.models import Results
 
@@ -22,6 +22,11 @@ async def test_render(httpx_mock: HTTPXMock):
             score=99,
             created_date=fake.date(),
             modified_date=fake.date(),
+            article_source=ArticleSource(
+                id=uuid.uuid4(),
+                name=fake.name(),
+                link=fake.url()
+            ),
             article_data_sources=[]
         )],
         number=0,

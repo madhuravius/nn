@@ -30,11 +30,11 @@ black_check:
 .PHONY: black_check
 
 isort_check:
-	$(PYTHON_VENV) isort --check-only .
+	$(PYTHON_VENV) isort --check-only ./nn
 .PHONY: isort_check
 
 mypy_check:
-	$(PYTHON_VENV) mypy .
+	$(PYTHON_VENV) mypy ./nn
 .PHONY: mypy_check
 
 lint: black_check isort_check mypy_check

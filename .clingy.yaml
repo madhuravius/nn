@@ -6,5 +6,9 @@ steps:
   command: echo 
   args:
     - "Starting"
-- label: run the command
+- label: run the help command
   command: ./nn.pex
+- label: run the all command
+  command: ./nn.pex all
+- label: run the page 2 of all command
+  command: ./nn.pex all -p 2
