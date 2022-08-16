@@ -41,7 +41,7 @@ run: .venv
 .PHONY: run
 
 pex: .venv
-	python -m pex . \
+	$(PYTHON_VENV) pex . \
 		--python-shebang="#!/usr/bin/env python3" \
 		--console-script nn -v -o nn.pex \
 		--disable-cache
