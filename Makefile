@@ -33,8 +33,16 @@ isort_check:
 	$(PYTHON_VENV) isort --check-only .
 .PHONY: isort_check
 
-lint: black_check isort_check
+mypy_check:
+	$(PYTHON_VENV) mypy .
+.PHONY: mypy_check
+
+lint: black_check isort_check mypy_check
 .PHONY: lint
+
+test:
+	$(PYTHON_VENV) pytest tests -v --cov=./nn --cov-report term-missing
+.PHONY: test
 
 run: .venv
 	$(PYTHON_VENV) ./run.sh
