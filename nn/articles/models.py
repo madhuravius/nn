@@ -1,13 +1,13 @@
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional
 
-from dataclasses_json import dataclass_json
+from dataclasses_json import DataClassJsonMixin, dataclass_json
 
 
 @dataclass_json
 @dataclass
-class ArticleDataSource:
+class ArticleDataSource(DataClassJsonMixin):
     hn_by: Optional[str] = None
     hn_descendants: Optional[int] = None
     hn_id: Optional[int] = None
@@ -16,7 +16,7 @@ class ArticleDataSource:
 
 @dataclass_json
 @dataclass
-class Article:
+class Article(DataClassJsonMixin):
     id: uuid.UUID
     title: str
     description: Optional[str]
@@ -24,4 +24,4 @@ class Article:
     score: float
     created_date: str
     modified_date: str
-    article_data_sources: list[ArticleDataSource]
+    article_data_sources: List[ArticleDataSource]

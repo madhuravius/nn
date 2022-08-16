@@ -1,4 +1,5 @@
 from os import get_terminal_size
+from typing import Any, Optional
 
 import rich_click as click
 from click_default_group import DefaultGroup
@@ -10,11 +11,11 @@ from .util import click_async
 
 
 @click.group(cls=DefaultGroup, default="download", default_if_no_args=True)
-def cli():
+def app() -> Optional[Any]:
     pass
 
 
-@click.command()
+@click.command()  # type: ignore
 @click.option(
     "--debug",
     "-d",
@@ -32,7 +33,7 @@ def cli():
     data. This is based around a 1-index.""",
 )
 @click_async
-async def cli(debug: bool, page: int):
+async def cli(debug: bool, page: int) -> None:
     """
     This CLI consolidates news entries by popular news sources and de-duplicates them when a common
     source is encountered (ex: HackerNews, Reddit, Lobste.rs, etc.)
@@ -44,7 +45,8 @@ async def cli(debug: bool, page: int):
     console = Console()
     results = await get_and_show_articles(debug=debug, page=page, page_size=page_size)
     console.print(results)
+    return
 
 
 if __name__ == "__main__":
-    cli()
+    app()

@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from dataclasses_json import dataclass_json
+from dataclasses_json import DataClassJsonMixin, dataclass_json
 
 from .articles.models import Article
 
 
 @dataclass_json
 @dataclass
-class Results:
+class Results(DataClassJsonMixin):
     content: Optional[List[Article]] = None
     error: Optional[str] = None
     last: Optional[bool] = None

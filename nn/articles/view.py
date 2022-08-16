@@ -10,7 +10,7 @@ from .client import get_article_list
 
 async def generate_results_table(
     debug: bool, page: int, page_size: int
-) -> Optional[Tuple[Optional[Results], Optional[Table]]]:
+) -> Tuple[Optional[Results], Optional[Table]]:
     raw_results = await asyncio.gather(
         asyncio.sleep(0.5), get_article_list(debug, page - 1, page_size)
     )
@@ -20,6 +20,9 @@ async def generate_results_table(
     _, results = raw_results
     if results.error:
         return None, print(results.error)
+
+    if not type(results) == Results or not results.content:
+        return None, print("No results found")
 
     table = Table(title="News Now", box=None)
     table.add_column()
@@ -37,7 +40,7 @@ async def generate_results_table(
                     metadata_comments += f"HN: [link={hn_link}]{article_data_source.hn_descendants}[/link]"
                     metadata_scores += f"HN: {article_data_source.hn_score}"
         table.add_row(
-            str(idx + (1 + (results.number * results.size))),
+            str(idx + (1 + (results.number * results.size))),  # type: ignore
             f"[link={row.link}]{row.title}[/link]",
             metadata_comments,
             metadata_scores,

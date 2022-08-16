@@ -1,5 +1,6 @@
 import http
 import json
+from typing import Any
 
 import httpx
 from httpx import ConnectError
@@ -9,7 +10,7 @@ from ..constants import BASE_NEWS_URL
 from ..models import Results
 
 
-async def get_article_list(debug: bool, page: int, page_size: int) -> Results:
+async def get_article_list(debug: bool, page: int, page_size: int) -> Any:
     async with httpx.AsyncClient() as client:
         try:
             results = await client.get(
@@ -22,6 +23,14 @@ async def get_article_list(debug: bool, page: int, page_size: int) -> Results:
 
             if results.status_code == http.HTTPStatus.OK:
                 return Results.from_json(results.content)
+            else:
+                return Results.from_json(
+                    json.dumps(
+                        {
+                            "error": f"Unable to connect to server with code {results.status_code}."
+                        }
+                    )
+                )
         except ConnectError:
             return Results.from_json(
                 json.dumps({"error": "Unable to connect to server."})
