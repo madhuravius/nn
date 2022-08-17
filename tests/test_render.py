@@ -10,7 +10,7 @@ from nn.articles.service import get_and_show_articles
 from nn.models import Results
 
 
-async def test_render(httpx_mock: HTTPXMock):
+async def test_render(httpx_mock: HTTPXMock) -> None:
     fake = Faker()
     name = fake.name()
     httpx_mock.add_response(json=json.loads(Results(

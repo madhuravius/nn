@@ -53,6 +53,7 @@ pex: .venv
 		--python-shebang="#!/usr/bin/env python3" \
 		--console-script nn -v -o nn.pex \
 		--disable-cache
+	chmod +x ./nn.pex
 .PHONY: pex
 
 pex_debug: pex
