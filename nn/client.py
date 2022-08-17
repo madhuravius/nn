@@ -1,6 +1,6 @@
 import http
 import json
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 import httpx
 from httpx import ConnectError
@@ -9,7 +9,7 @@ from rich import print_json
 from .models import Results
 
 
-def extract_results_from_call(raw_results) -> Optional[Results]:
+def extract_results_from_call(raw_results: Tuple[Any, Results]) -> Optional[Results]:
     if not raw_results:
         print("No results found.")
         return None
