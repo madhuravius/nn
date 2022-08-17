@@ -55,6 +55,7 @@ def app(debug: bool, number: int, page: int) -> None:
 
 
 @click.command("sources")  # type: ignore
+@common_options
 @click_async
 async def list_sources(debug: bool, number: int, page: int) -> None:
     """
@@ -68,13 +69,17 @@ async def list_sources(debug: bool, number: int, page: int) -> None:
         return
 
 
-async def common_list_entry(debug: bool, number: int, page: int) -> None:
+async def common_list_entry(
+    debug: bool, filters: Optional[str], number: int, page: int
+) -> None:
     if debug:
         print("Debug mode enabled")
 
     console = Console()
     with console.status("Loading..."):
-        results = await get_and_show_articles(debug=debug, page=page - 1, number=number)
+        results = await get_and_show_articles(
+            debug=debug, raw_filters=filters or [], page=page - 1, number=number
+        )
         console.print(results)
         return
 
@@ -86,24 +91,33 @@ async def common_list_entry(debug: bool, number: int, page: int) -> None:
     source is encountered (ex: HackerNews, Reddit, Lobste.rs, etc.)
     """,
 )
+@click.option(
+    "--filter-sources",
+    "-fs",
+    default="",
+    help=f"Pass in a set of filter sources in a csv way. Example: "
+    f"--filter-sources hn,lobsters",
+)
 @common_options
 @click_async
-async def list_articles(debug: bool, number: int, page: int) -> None:
-    return await common_list_entry(debug, number, page)
+async def list_articles(
+    debug: bool, filter_sources: str, number: int, page: int
+) -> None:
+    return await common_list_entry(debug, filter_sources.split(","), number, page)
 
 
 @click.command("hn", help="List news entries only from Hacker News")  # type: ignore
 @common_options
 @click_async
 async def list_hn(debug: bool, number: int, page: int) -> None:
-    return await common_list_entry(debug, number, page)
+    return await common_list_entry(debug, ["hn"], number, page)
 
 
 @click.command("lobsters", help="List news entries only from Lobste.rs")  # type: ignore
 @common_options
 @click_async
 async def list_lobsters(debug: bool, number: int, page: int) -> None:
-    return await common_list_entry(debug, number, page)
+    return await common_list_entry(debug, ["lobsters"], number, page)
 
 
 app.add_command(list_sources)

@@ -2,6 +2,7 @@ import asyncio
 from typing import Any, Dict, Optional, Tuple, cast
 
 import arrow
+from rich import print
 from rich.table import Table
 
 from .. import client
@@ -70,12 +71,18 @@ def add_lobsters_data(
 
 
 async def generate_results_table(
-    debug: bool, number: int, page: int
+    debug: bool, csv_filters: str, number: int, page: int
 ) -> Tuple[Optional[Results], Optional[Table]]:
     url = (
         f"{BASE_NEWS_URL}/api/v1/articles?"
         f"sort=score,desc&sort=createdDate,desc&page={max(0, page)}&size={number}"
     )
+    if csv_filters:
+        url += f"&filterDataSources={csv_filters}"
+
+    if debug:
+        print(f"Querying URL: [blue]{url}[/]")
+
     raw_results = await asyncio.gather(asyncio.sleep(1), client.get(debug, url))
     results = client.extract_results_from_call(raw_results)
     if not results or not results.content:
