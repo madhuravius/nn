@@ -3,10 +3,10 @@ from typing import Any, Dict, Optional, Tuple, cast
 
 from rich.table import Table
 
-from .models import DataSource
 from .. import client
 from ..constants import BASE_NEWS_URL, HN_LABEL, LOBSTERS_LABEL
 from ..models import Results
+from .models import DataSource
 
 
 def get_label_from_name(name: str) -> str:
@@ -18,12 +18,10 @@ def get_label_from_name(name: str) -> str:
 
 
 async def generate_sources_table(
-    debug: bool
+    debug: bool,
 ) -> Tuple[Optional[Results], Optional[Table]]:
     url = f"{BASE_NEWS_URL}/api/v1/data_sources"
-    raw_results = await asyncio.gather(
-        asyncio.sleep(1), client.get(debug, url)
-    )
+    raw_results = await asyncio.gather(asyncio.sleep(1), client.get(debug, url))
     results = client.extract_results_from_call(raw_results)
     if not results or not results.content:
         return None, None
@@ -42,6 +40,5 @@ async def generate_sources_table(
             f"\n{row.description}\n",
             f"\n[link={row.link}]Link[/link]\n",
         )
-
 
     return results, table

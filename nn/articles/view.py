@@ -8,11 +8,12 @@ from .. import client
 from ..constants import (
     BASE_HACKERS_NEWS_PAGE_URL,
     BASE_LOBSTERS_PAGE_URL,
+    BASE_NEWS_URL,
     HN_LABEL,
-    LOBSTERS_LABEL, BASE_NEWS_URL,
+    LOBSTERS_LABEL,
 )
 from ..models import Results
-from .models import ArticleDataSource, Article
+from .models import Article, ArticleDataSource
 
 
 def add_newlines_for_row_entries(
@@ -71,11 +72,11 @@ def add_lobsters_data(
 async def generate_results_table(
     debug: bool, page: int, page_size: int
 ) -> Tuple[Optional[Results], Optional[Table]]:
-    url = f"{BASE_NEWS_URL}/api/v1/articles?" \
-          f"sort=score,desc&sort=createdDate,desc&page={max(0, page)}&size={page_size}"
-    raw_results = await asyncio.gather(
-        asyncio.sleep(1), client.get(debug, url)
+    url = (
+        f"{BASE_NEWS_URL}/api/v1/articles?"
+        f"sort=score,desc&sort=createdDate,desc&page={max(0, page)}&size={page_size}"
     )
+    raw_results = await asyncio.gather(asyncio.sleep(1), client.get(debug, url))
     results = client.extract_results_from_call(raw_results)
     if not results or not results.content:
         return None, None

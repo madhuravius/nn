@@ -4,8 +4,9 @@ import rich_click as click
 from rich import print
 from rich.console import Console
 
-from .articles.service import get_and_show_articles
 from nn.sources.service import get_and_show_sources
+
+from .articles.service import get_and_show_articles
 from .constants import DEFAULT_PAGE_SIZE
 from .util import click_async
 

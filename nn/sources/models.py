@@ -1,7 +1,7 @@
 import uuid
 from dataclasses import dataclass
 
-from dataclasses_json import dataclass_json, DataClassJsonMixin
+from dataclasses_json import DataClassJsonMixin, dataclass_json
 
 
 @dataclass_json
