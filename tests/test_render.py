@@ -36,8 +36,8 @@ async def test_render(httpx_mock: HTTPXMock) -> None:
     console = Console(record=True)
     console.print(await get_and_show_articles(
         debug=False,
+        number=5,
         page=0,
-        page_size=5
     ))
     output = console.export_text()
     assert name in output
