@@ -12,8 +12,8 @@ from .util import click_async
 
 # Use Rich markup
 click.rich_click.USE_RICH_MARKUP = True
-COMMON_APPLY_TEXT = """Applies to:  [yellow]all[/], [yellow]hn[/],
-and [yellow]lobsters[/yellow]."""
+COMMON_APPLY_TEXT = """Applies to:  [yellow]all[/], [yellow]hn[/], [yellow]lobsters[/yellow] and
+[yellow]reddit[/]."""
 
 
 def common_options(func: Any) -> Any:
@@ -54,7 +54,10 @@ def app(debug: bool, number: int, page: int) -> None:
     pass
 
 
-@click.command("sources")  # type: ignore
+@click.command(  # type: ignore
+    "sources",
+    help="News sources that power this app. Run this to see where news is fed in from.",
+)
 @common_options
 @click_async
 async def list_sources(debug: bool, number: int, page: int) -> None:
@@ -120,10 +123,18 @@ async def list_lobsters(debug: bool, number: int, page: int) -> None:
     return await common_list_entry(debug, ["lobsters"], number, page)
 
 
+@click.command("reddit", help="List news entries only from Reddit")  # type: ignore
+@common_options
+@click_async
+async def list_reddit(debug: bool, number: int, page: int) -> None:
+    return await common_list_entry(debug, ["reddit"], number, page)
+
+
 app.add_command(list_sources)
 app.add_command(list_articles)
 app.add_command(list_hn)
 app.add_command(list_lobsters)
+app.add_command(list_reddit)
 
 
 if __name__ == "__main__":

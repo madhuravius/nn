@@ -8,8 +8,6 @@ from ..constants import BASE_NEWS_URL
 from ..sources.models import DataSource
 from .view import generate_results_table
 
-MAP_OF_FILTERS_TO_DATA_SOURCE_NAMES = {"hn": "Hacker News", "lobsters": "Lobste.rs"}
-
 
 async def get_and_show_articles(
     debug: bool, raw_filters: Optional[List[str]], number: int, page: int
@@ -26,10 +24,7 @@ async def get_and_show_articles(
         for result in results.content:
             data_source = DataSource.from_dict(cast(Dict[str, Any], result))
             for raw_filter in raw_filters:
-                if (
-                    MAP_OF_FILTERS_TO_DATA_SOURCE_NAMES.get(raw_filter)
-                    == data_source.name
-                ):
+                if raw_filter == data_source.metadata.group_as:
                     pre_csv_filters.append(str(data_source.id))
         filters = ",".join(pre_csv_filters)
 

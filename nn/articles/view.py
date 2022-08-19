@@ -11,7 +11,7 @@ from ..constants import (
     BASE_LOBSTERS_PAGE_URL,
     BASE_NEWS_URL,
     HN_LABEL,
-    LOBSTERS_LABEL,
+    LOBSTERS_LABEL, BASE_REDDIT_PAGE_URL, REDDIT_LABEL,
 )
 from ..models import Results
 from .models import Article, ArticleDataSource
@@ -70,15 +70,39 @@ def add_lobsters_data(
     return metadata_comments, metadata_scores
 
 
+def add_reddit_data(
+    article_data_source: ArticleDataSource,
+    metadata_comments: str,
+    metadata_scores: str,
+) -> Tuple[str, str]:
+    if article_data_source.reddit_name:
+        metadata_comments, metadata_scores = add_newlines_for_row_entries(
+            metadata_comments, metadata_scores
+        )
+
+        reddit_link = (
+            f"{BASE_REDDIT_PAGE_URL}{article_data_source.reddit_sub_reddit}/comments/{article_data_source.reddit_name.replace(f'{article_data_source.reddit_kind}_', '')}"
+        )
+
+        metadata_comments += (
+            f"{REDDIT_LABEL} [link={reddit_link}]"
+            f"{article_data_source.reddit_num_comments}[/link]"
+        )
+        metadata_scores += f"{REDDIT_LABEL} {article_data_source.reddit_score}"
+    return metadata_comments, metadata_scores
+
+
 async def generate_results_table(
     debug: bool, csv_filters: str, number: int, page: int
 ) -> Tuple[Optional[Results], Optional[Table]]:
-    url = (
-        f"{BASE_NEWS_URL}/api/v1/articles?"
-        f"sort=score,desc&sort=createdDate,desc&page={max(0, page)}&size={number}"
-    )
+    url = f"{BASE_NEWS_URL}/api/v1/articles"
     if csv_filters:
-        url += f"&filterDataSources={csv_filters}"
+        # sub endpoint within articles to capture more filtered posts
+        url += "/search"
+    url += f"?sort=score,desc&sort=createdDate,desc&page={max(0, page)}&size={number}"
+
+    if csv_filters:
+        url += f"&dataSources={csv_filters}"
 
     if debug:
         print(f"Querying URL: [blue]{url}[/]")
@@ -98,11 +122,16 @@ async def generate_results_table(
         metadata_comments = ""
         metadata_scores = ""
         if row.article_data_sources:
-            for article_data_source in row.article_data_sources:
+            for article_data_source in sorted(
+                row.article_data_sources, key=lambda d: d.id.data_source_id
+            ):
                 metadata_comments, metadata_scores = add_hn_data(
                     article_data_source, metadata_comments, metadata_scores
                 )
                 metadata_comments, metadata_scores = add_lobsters_data(
+                    article_data_source, metadata_comments, metadata_scores
+                )
+                metadata_comments, metadata_scores = add_reddit_data(
                     article_data_source, metadata_comments, metadata_scores
                 )
 

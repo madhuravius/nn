@@ -4,16 +4,18 @@ from typing import Any, Dict, Optional, Tuple, cast
 from rich.table import Table
 
 from .. import client
-from ..constants import BASE_NEWS_URL, HN_LABEL, LOBSTERS_LABEL
+from ..constants import BASE_NEWS_URL, HN_LABEL, LOBSTERS_LABEL, REDDIT_LABEL
 from ..models import Results
 from .models import DataSource
 
 
-def get_label_from_name(name: str) -> str:
-    if name == "Hacker News":
+def get_label_from_group_as(group_as: str) -> str:
+    if group_as == "hn":
         return HN_LABEL
-    elif name == "Lobste.rs":
+    elif group_as == "lobsters":
         return LOBSTERS_LABEL
+    elif group_as == "reddit":
+        return REDDIT_LABEL
     return ""
 
 
@@ -32,10 +34,13 @@ async def generate_sources_table(
     table.add_column()
     table.add_column()
     table.add_column()
-    for idx, raw_row in enumerate(results.content):
-        row: DataSource = DataSource.from_dict(cast(Dict[str, Any], raw_row))
+    content = []
+    for raw_row in results.content:
+        content.append(DataSource.from_dict(cast(Dict[str, Any], raw_row)))
+
+    for idx, row in enumerate(sorted(content, key=lambda d: d.name)):
         table.add_row(
-            f"\n{get_label_from_name(row.name)}",
+            f"\n{get_label_from_group_as(row.metadata.group_as)}",
             f"\n{row.name}\n",
             f"\n{row.description}\n",
             f"\n[link={row.link}]Link[/link]\n",
