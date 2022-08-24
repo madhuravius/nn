@@ -1,18 +1,22 @@
 import asyncio
-from typing import Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, cast
 
 import arrow
+from rich import print
 from rich.table import Table
 
+from .. import client
 from ..constants import (
     BASE_HACKERS_NEWS_PAGE_URL,
     BASE_LOBSTERS_PAGE_URL,
+    BASE_NEWS_URL,
+    BASE_REDDIT_PAGE_URL,
     HN_LABEL,
     LOBSTERS_LABEL,
+    REDDIT_LABEL,
 )
 from ..models import Results
-from .client import get_article_list
-from .models import ArticleDataSource
+from .models import Article, ArticleDataSource
 
 
 def add_newlines_for_row_entries(
@@ -39,10 +43,10 @@ def add_hn_data(
         hn_link = f"{BASE_HACKERS_NEWS_PAGE_URL}{article_data_source.hn_id}"
 
         metadata_comments += (
-            f"{HN_LABEL}-[link={hn_link}]"
+            f"{HN_LABEL} [link={hn_link}]"
             f"{article_data_source.hn_descendants}[/link]"
         )
-        metadata_scores += f"{HN_LABEL}-{article_data_source.hn_score}"
+        metadata_scores += f"{HN_LABEL} {article_data_source.hn_score}"
     return metadata_comments, metadata_scores
 
 
@@ -61,43 +65,76 @@ def add_lobsters_data(
         )
 
         metadata_comments += (
-            f"{LOBSTERS_LABEL}-[link={lobsters_link}]"
+            f"{LOBSTERS_LABEL} [link={lobsters_link}]"
             f"{article_data_source.lobsters_comment_count}[/link]"
         )
-        metadata_scores += f"{LOBSTERS_LABEL}-{article_data_source.lobsters_score}"
+        metadata_scores += f"{LOBSTERS_LABEL} {article_data_source.lobsters_score}"
+    return metadata_comments, metadata_scores
+
+
+def add_reddit_data(
+    article_data_source: ArticleDataSource,
+    metadata_comments: str,
+    metadata_scores: str,
+) -> Tuple[str, str]:
+    if article_data_source.reddit_name:
+        metadata_comments, metadata_scores = add_newlines_for_row_entries(
+            metadata_comments, metadata_scores
+        )
+
+        reddit_link_suffix = article_data_source.reddit_name.replace(
+            f"{article_data_source.reddit_kind}_", ""
+        )
+        reddit_link = f"{BASE_REDDIT_PAGE_URL}{article_data_source.reddit_subreddit}/comments/{reddit_link_suffix}"
+
+        metadata_comments += (
+            f"{REDDIT_LABEL} [link={reddit_link}]"
+            f"{article_data_source.reddit_num_comments}[/link]"
+        )
+        metadata_scores += f"{REDDIT_LABEL} {article_data_source.reddit_score}"
     return metadata_comments, metadata_scores
 
 
 async def generate_results_table(
-    debug: bool, page: int, page_size: int
+    debug: bool, csv_filters: str, number: int, page: int
 ) -> Tuple[Optional[Results], Optional[Table]]:
-    raw_results = await asyncio.gather(
-        asyncio.sleep(0.5), get_article_list(debug, page - 1, page_size)
-    )
-    if not raw_results:
-        return None, print("No results found.")
+    url = f"{BASE_NEWS_URL}/api/v1/articles"
+    if csv_filters:
+        # sub endpoint within articles to capture more filtered posts
+        url += "/search"
+    url += f"?sort=score,desc&sort=createdDate,desc&page={max(0, page)}&size={number}"
 
-    _, results = raw_results
-    if results.error:
-        return None, print(results.error)
+    if csv_filters:
+        url += f"&dataSources={csv_filters}"
 
-    if not type(results) == Results or not results.content:
-        return None, print("No results found")
+    if debug:
+        print(f"Querying URL: [blue]{url}[/]")
+
+    raw_results = await asyncio.gather(asyncio.sleep(1), client.get(debug, url))
+    results = client.extract_results_from_call(raw_results)
+    if not results or not results.content:
+        return None, None
 
     table = Table(title="News Now", box=None, row_styles=["on #333333", ""])
     table.add_column()
     table.add_column("Title", justify="left", style="cyan")
     table.add_column("💬", justify="left")
     table.add_column("🏆 Scores", justify="left")
-    for idx, row in enumerate(results.content):
+    for idx, raw_row in enumerate(results.content):
+        row = Article.from_dict(cast(Dict[str, Any], raw_row))
         metadata_comments = ""
         metadata_scores = ""
         if row.article_data_sources:
-            for article_data_source in row.article_data_sources:
+            for article_data_source in sorted(
+                row.article_data_sources, key=lambda d: d.id.data_source_id
+            ):
                 metadata_comments, metadata_scores = add_hn_data(
                     article_data_source, metadata_comments, metadata_scores
                 )
                 metadata_comments, metadata_scores = add_lobsters_data(
+                    article_data_source, metadata_comments, metadata_scores
+                )
+                metadata_comments, metadata_scores = add_reddit_data(
                     article_data_source, metadata_comments, metadata_scores
                 )
 

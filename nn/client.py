@@ -1,22 +1,35 @@
 import http
 import json
-from typing import Any
+from typing import Any, Optional, Tuple
 
 import httpx
 from httpx import ConnectError
 from rich import print_json
 
-from ..constants import BASE_NEWS_URL
-from ..models import Results
+from .models import Results
 
 
-async def get_article_list(debug: bool, page: int, page_size: int) -> Any:
+def extract_results_from_call(raw_results: Tuple[Any, Results]) -> Optional[Results]:
+    if not raw_results:
+        print("No results found.")
+        return None
+
+    _, results = raw_results
+    if results.error:
+        print(results.error)
+        return None
+
+    if not type(results) == Results or not results.content:
+        print("No results found")
+        return None
+
+    return results
+
+
+async def get(debug: bool, url: str) -> Any:
     async with httpx.AsyncClient() as client:
         try:
-            results = await client.get(
-                f"{BASE_NEWS_URL}/api/v1/articles?"
-                f"sort=score,desc&sort=createdDate,desc&page={max(0, page)}&size={page_size}"
-            )
+            results = await client.get(url)
 
             if debug:
                 print_json(json=str(results.content.decode()))

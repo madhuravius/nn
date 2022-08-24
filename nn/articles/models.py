@@ -7,7 +7,16 @@ from dataclasses_json import DataClassJsonMixin, dataclass_json
 
 @dataclass_json
 @dataclass
+class ArticleDataSourceId(DataClassJsonMixin):
+    article_id: uuid.UUID
+    data_source_id: uuid.UUID
+
+
+@dataclass_json
+@dataclass
 class ArticleDataSource(DataClassJsonMixin):
+    id: ArticleDataSourceId
+
     hn_by: Optional[str] = None
     hn_descendants: Optional[int] = None
     hn_id: Optional[int] = None
@@ -17,6 +26,14 @@ class ArticleDataSource(DataClassJsonMixin):
     lobsters_comment_count: Optional[int] = None
     lobsters_score: Optional[int] = None
     lobsters_short_id: Optional[str] = None
+
+    reddit_author: Optional[str] = None
+    reddit_kind: Optional[str] = None
+    reddit_name: Optional[str] = None
+    reddit_num_comments: Optional[int] = None
+    reddit_permalink: Optional[str] = None
+    reddit_score: Optional[int] = None
+    reddit_subreddit: Optional[str] = None
 
 
 @dataclass_json
