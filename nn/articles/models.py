@@ -33,7 +33,7 @@ class ArticleDataSource(DataClassJsonMixin):
     reddit_num_comments: Optional[int] = None
     reddit_permalink: Optional[str] = None
     reddit_score: Optional[int] = None
-    reddit_sub_reddit: Optional[str] = None
+    reddit_subreddit: Optional[str] = None
 
 
 @dataclass_json

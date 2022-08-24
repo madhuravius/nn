@@ -36,6 +36,7 @@ async def test_render(httpx_mock: HTTPXMock) -> None:
     console = Console(record=True)
     console.print(await get_and_show_articles(
         debug=False,
+        raw_filters=[],
         number=5,
         page=0,
     ))

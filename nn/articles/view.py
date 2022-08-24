@@ -10,8 +10,10 @@ from ..constants import (
     BASE_HACKERS_NEWS_PAGE_URL,
     BASE_LOBSTERS_PAGE_URL,
     BASE_NEWS_URL,
+    BASE_REDDIT_PAGE_URL,
     HN_LABEL,
-    LOBSTERS_LABEL, BASE_REDDIT_PAGE_URL, REDDIT_LABEL,
+    LOBSTERS_LABEL,
+    REDDIT_LABEL,
 )
 from ..models import Results
 from .models import Article, ArticleDataSource
@@ -80,9 +82,10 @@ def add_reddit_data(
             metadata_comments, metadata_scores
         )
 
-        reddit_link = (
-            f"{BASE_REDDIT_PAGE_URL}{article_data_source.reddit_sub_reddit}/comments/{article_data_source.reddit_name.replace(f'{article_data_source.reddit_kind}_', '')}"
+        reddit_link_suffix = article_data_source.reddit_name.replace(
+            f"{article_data_source.reddit_kind}_", ""
         )
+        reddit_link = f"{BASE_REDDIT_PAGE_URL}{article_data_source.reddit_subreddit}/comments/{reddit_link_suffix}"
 
         metadata_comments += (
             f"{REDDIT_LABEL} [link={reddit_link}]"
