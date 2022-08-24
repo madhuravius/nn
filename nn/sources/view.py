@@ -9,7 +9,7 @@ from ..models import Results
 from .models import DataSource
 
 
-def get_label_from_group_as(group_as: str) -> str:
+def get_label_from_group_as(group_as: Optional[str]) -> str:
     if group_as == "hn":
         return HN_LABEL
     elif group_as == "lobsters":

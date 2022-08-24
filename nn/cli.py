@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 import rich_click as click
 from rich import print
@@ -73,7 +73,7 @@ async def list_sources(debug: bool, number: int, page: int) -> None:
 
 
 async def common_list_entry(
-    debug: bool, filters: Optional[str], number: int, page: int
+    debug: bool, filters: Optional[List[str]], number: int, page: int
 ) -> None:
     if debug:
         print("Debug mode enabled")
