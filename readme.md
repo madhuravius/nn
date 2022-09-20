@@ -4,7 +4,7 @@ A simple news CLI to get programming news now (nn) by common listings in Reddit,
 Lobste.rs, etc. This wraps a Spring Boot-powered backend aggregator that lives 
 on [news.madhu.dev](https://news.madhu.dev/api/v1/articles).
 
-![alt text](https://github.com/madhuravius/nn/blob/main/screen.jpg?raw=true)
+![help](https://github.com/madhuravius/nn/blob/main/docs/screen2.png?raw=true) | ![listing](https://github.com/madhuravius/nn/blob/main/docs/screen1.png?raw=true)
 
 ## Quickstart
 
