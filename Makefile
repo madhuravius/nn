@@ -68,11 +68,3 @@ clean:
 	rm -Rf dist || true
 	rm -Rf .venv || true
 .PHONY: clean
-
-start-docs:
-	docker run \
-		--rm \
-		-it \
-		-p 8000:8000 \
-		-v ${PWD}:/docs squidfunk/mkdocs-material
-.PHONY: start-docs
